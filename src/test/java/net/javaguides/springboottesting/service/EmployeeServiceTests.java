@@ -8,25 +8,36 @@ import net.javaguides.springboottesting.service.impl.EmployeeServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.BDDMockito.given;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+@ExtendWith(MockitoExtension.class) // 如果要用Annotation注入Mock必須要加這段
 public class EmployeeServiceTests {
 
-    private EmployeeRepository employeeRepository;
-    private EmployeeService employeeService;
-
     /**
-     * 使用一般建構子注入的方式
+     * 使用annotation注入的方式
      */
+    @Mock
+    private EmployeeRepository employeeRepository;
+    @InjectMocks
+    private EmployeeServiceImpl employeeService;
+
+    private Employee employee;
+
     @BeforeEach
     public void setup(){
-        employeeRepository = Mockito.mock(EmployeeRepository.class);
-        employeeService = new EmployeeServiceImpl(employeeRepository);
+        employee = Employee.builder()
+                .id(1L)
+                .firstname("Ives")
+                .lastname("He")
+                .email("ivesxxx@google.com.tw")
+                .build();
     }
 
     // Junit test for saveEmployee method
@@ -34,17 +45,10 @@ public class EmployeeServiceTests {
     @Test
     public void givenEmployeeObject_whenSaveEmployee_thenReturnEmployeeObject(){
         // given - precondition or setup
-        Employee employee = Employee.builder()
-                .id(1L)
-                .firstname("Ives")
-                .lastname("He")
-                .email("ivesxxx@google.com.tw")
-                .build();
-
-        BDDMockito.given(employeeRepository.findByEmail(employee.getEmail()))
+        given(employeeRepository.findByEmail(employee.getEmail()))
                 .willReturn(Optional.empty());
 
-        BDDMockito.given(employeeRepository.save(employee)).willReturn(employee);
+        given(employeeRepository.save(employee)).willReturn(employee);
         // when - action or the behavior that we are going test
         Employee savedEmployee = employeeService.saveEmployee(employee);
 
