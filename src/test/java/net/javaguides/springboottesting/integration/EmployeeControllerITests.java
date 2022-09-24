@@ -20,8 +20,7 @@ import java.util.Optional;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -138,6 +137,67 @@ public class EmployeeControllerITests {
 
         // when - action or the behavior that we are going test
         ResultActions response = mockMvc.perform(get("/api/employees/{id}",employeeId));
+
+        // then - verify the output
+        response.andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+    // Junit test for update employee REST API - positive scenario
+    @DisplayName("Junit test for update employee REST API - positive scenario")
+    @Test
+    public void givenUpdatedEmployee_whenUpdateEmployee_thenReturnUpdateEmployeeObject() throws Exception {
+        // given - precondition or setup
+        Employee savedEmployee = Employee.builder()
+                .firstname("Ives")
+                .lastname("He")
+                .email("ivesxxx@google.com.tw")
+                .build();
+        employeeRepository.save(savedEmployee);
+
+        Employee updatedEmployee = Employee.builder()
+                .firstname("AAA")
+                .lastname("DD")
+                .email("sdsdccc@google.com.tw")
+                .build();
+
+        // when - action or the behavior that we are going test
+        ResultActions response = mockMvc.perform(put("/api/employees/{id}",savedEmployee.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedEmployee)));
+
+        // then - verify the output
+        response.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.firstname",is(updatedEmployee.getFirstname())))
+                .andExpect(jsonPath("$.lastname",is(updatedEmployee.getLastname())))
+                .andExpect(jsonPath("$.email",is(updatedEmployee.getEmail())));
+    }
+
+    // Junit test for update employee REST API - negative scenario
+    @DisplayName("Junit test for update employee REST API - negative scenario")
+    @Test
+    public void givenUpdatedEmployee_whenUpdateEmployee_thenReturnEmpty() throws Exception {
+        // given - precondition or setup
+        long employeeId = 0L;
+        Employee savedEmployee = Employee.builder()
+                .firstname("Ives")
+                .lastname("He")
+                .email("ivesxxx@google.com.tw")
+                .build();
+
+        employeeRepository.save(savedEmployee);
+
+        Employee updatedEmployee = Employee.builder()
+                .firstname("AAA")
+                .lastname("DD")
+                .email("sdsdccc@google.com.tw")
+                .build();
+
+        // when - action or the behavior that we are going test
+        ResultActions response = mockMvc.perform(put("/api/employees/{id}",employeeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedEmployee)));
 
         // then - verify the output
         response.andExpect(status().isNotFound())
