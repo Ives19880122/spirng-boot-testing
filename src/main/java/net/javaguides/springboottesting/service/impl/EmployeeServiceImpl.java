@@ -4,10 +4,12 @@ import net.javaguides.springboottesting.exception.ResourceNotFoundException;
 import net.javaguides.springboottesting.model.Employee;
 import net.javaguides.springboottesting.repository.EmployeeRepository;
 import net.javaguides.springboottesting.service.EmployeeService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class EmployeeServiceImpl implements EmployeeService {
 
     /**
