@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class) // 如果要用Annotation注入Mock必須要加這段
@@ -76,5 +77,27 @@ public class EmployeeServiceTests {
 
         // then - verify the output 前面已經拋出異常,所以接續的儲存方法不會執行
         verify(employeeRepository,never()).save(any(Employee.class));
+    }
+
+    // Junit test for getAllEmployees method
+    @DisplayName("Junit test for getAllEmployees method")
+    @Test
+    public void givenEmployeeList_whenGetAllEmployee_thenReturnEmployeeList(){
+        // given - precondition or setup
+        Employee employee1 = Employee.builder()
+                .id(2L)
+                .firstname("DDD")
+                .lastname("XXX")
+                .email("iDvaxxx@google.com.tw")
+                .build();
+
+        given(employeeRepository.findAll()).willReturn(List.of(employee,employee1));
+
+        // when - action or the behavior that we are going test
+        List<Employee> employeeList = employeeService.getAllEmployees();
+
+        // then - verify the output
+        assertThat(employeeList).isNotNull();
+        assertThat(employeeList.size()).isEqualTo(2);
     }
 }

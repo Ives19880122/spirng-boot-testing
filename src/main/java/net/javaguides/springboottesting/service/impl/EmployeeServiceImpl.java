@@ -5,6 +5,7 @@ import net.javaguides.springboottesting.model.Employee;
 import net.javaguides.springboottesting.repository.EmployeeRepository;
 import net.javaguides.springboottesting.service.EmployeeService;
 
+import java.util.List;
 import java.util.Optional;
 
 public class EmployeeServiceImpl implements EmployeeService {
@@ -28,5 +29,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         return employeeRepository.save(employee);
+    }
+
+    @Override
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
     }
 }
