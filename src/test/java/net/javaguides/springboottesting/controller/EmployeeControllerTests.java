@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @WebMvcTest // 測試WebMvc
 public class EmployeeControllerTests {
@@ -103,5 +104,46 @@ public class EmployeeControllerTests {
                  */
                 .andExpect(jsonPath("$.size()",
                         is(listOfEmployees.size())));
+    }
+
+    // positive scenario - valid employee id
+    // Junit test for GET employee by id REST API
+    @Test
+    public void givenEmployeeId_whenGetEmployeeById_thenReturnEmployeeObject() throws Exception {
+        // given - precondition or setup
+        long employeeId = 1L;
+        Employee employee = Employee.builder()
+                .id(1L)
+                .firstname("Ives")
+                .lastname("He")
+                .email("ivesxxx@google.com.tw")
+                .build();
+        given(employeeService.getEmployeeById(employeeId)).willReturn(Optional.of(employee));
+
+        // when - action or the behavior that we are going test
+        ResultActions response = mockMvc.perform(get("/api/employees/{id}",employeeId));
+
+        // then - verify the output
+        response.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.firstname",is(employee.getFirstname())))
+                .andExpect(jsonPath("$.lastname",is(employee.getLastname())))
+                .andExpect(jsonPath("$.email",is(employee.getEmail())));
+    }
+
+    // native scenario - valid employee id
+    // Junit test for GET employee by id REST API
+    @Test
+    public void givenInvalidEmployeeId_whenGetEmployeeById_thenReturnEmpty() throws Exception {
+        // given - precondition or setup
+        long employeeId = 1L;
+        given(employeeService.getEmployeeById(employeeId)).willReturn(Optional.empty());
+
+        // when - action or the behavior that we are going test
+        ResultActions response = mockMvc.perform(get("/api/employees/{id}",employeeId));
+
+        // then - verify the output
+        response.andExpect(status().isNotFound())
+                .andDo(print());
     }
 }
