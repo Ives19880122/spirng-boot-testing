@@ -13,14 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -150,4 +150,20 @@ public class EmployeeServiceTests {
         assertThat(updatedEmployee.getFirstname()).isEqualTo("ccc");
     }
 
+    // Junit test for deleteEmployee method
+    @DisplayName("Junit test for deleteEmployee method")
+    @Test
+    public void givenEmployeeId_whenDeleteEmployee_thenNothing(){
+        // given - precondition or setup
+        long employeeId = 1L;
+
+        willDoNothing().given(employeeRepository).deleteById(employeeId);
+
+        // when - action or the behavior that we are going test
+        employeeService.deleteEmployee(employeeId);
+
+        // then - verify the output
+        verify(employeeRepository, times(1)).deleteById(employeeId);
+
+    }
 }
