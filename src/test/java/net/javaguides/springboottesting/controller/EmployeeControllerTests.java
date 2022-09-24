@@ -1,31 +1,26 @@
 package net.javaguides.springboottesting.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.javaguides.springboottesting.model.Employee;
 import net.javaguides.springboottesting.service.EmployeeService;
-import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest // 測試WebMvc
 public class EmployeeControllerTests {
@@ -44,6 +39,7 @@ public class EmployeeControllerTests {
     private ObjectMapper objectMapper;
 
     // Junit test for Create employee REST API
+    @DisplayName("Junit test for Create employee REST API")
     @Test
     public void givenEmployeeObject_whenCreateEmployee_thenReturnEmployee() throws Exception {
         // given - precondition or setup
@@ -54,7 +50,7 @@ public class EmployeeControllerTests {
                 .email("ivesxxx@google.com.tw")
                 .build();
 
-        BDDMockito.given(employeeService.saveEmployee(ArgumentMatchers.any(Employee.class)))
+        given(employeeService.saveEmployee(any(Employee.class)))
                 .willAnswer((invocation) -> invocation.getArgument(0));
 
         // when - action or the behavior that we are going test
@@ -63,20 +59,21 @@ public class EmployeeControllerTests {
             .content(objectMapper.writeValueAsString(employee)));
 
         // then - verify the output
-        response.andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isCreated())
+        response.andDo(print())
+                .andExpect(status().isCreated())
                 /**
                  * 依據路徑對資料進行逐一比對
                  */
-                .andExpect(MockMvcResultMatchers.jsonPath("$.firstname",
-                        CoreMatchers.is(employee.getFirstname())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.lastname",
-                        CoreMatchers.is(employee.getLastname())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email",
-                        CoreMatchers.is(employee.getEmail())));
+                .andExpect(jsonPath("$.firstname",
+                        is(employee.getFirstname())))
+                .andExpect(jsonPath("$.lastname",
+                        is(employee.getLastname())))
+                .andExpect(jsonPath("$.email",
+                        is(employee.getEmail())));
     }
 
     // Junit test for Get All employees REST API
+    @DisplayName("Junit test for Get All employees REST API")
     @Test
     public void givenListOfEmployee_whenGetAllEmployees_thenReturnEmployeesList() throws Exception {
         // given - precondition or setup
@@ -99,13 +96,12 @@ public class EmployeeControllerTests {
         ResultActions response = mockMvc.perform(get("/api/employees"));
 
         // then - verify the output
-        response.andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(MockMvcResultHandlers.print())
+        response.andExpect(status().isOk())
+                .andDo(print())
                 /**
                  * 比對JSON資料
                  */
-                .andExpect(MockMvcResultMatchers.jsonPath("$.size()",
-                        CoreMatchers.is(listOfEmployees.size())));
-
+                .andExpect(jsonPath("$.size()",
+                        is(listOfEmployees.size())));
     }
 }
