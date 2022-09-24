@@ -10,7 +10,7 @@ import javax.websocket.server.PathParam;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/employees/")
+@RequestMapping("/api/employees")
 public class EmployeeController {
 
     private EmployeeService employeeService;
@@ -34,6 +34,20 @@ public class EmployeeController {
     public ResponseEntity<Employee> getEmployeesById(@PathVariable("id") long employeeId){
         return employeeService.getEmployeeById(employeeId)
                 .map(ResponseEntity::ok)
+                .orElseGet(()->ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<Employee> updateEmployee(@PathVariable("id") long employeeId ,
+                                                   @RequestBody Employee employee){
+        return employeeService.getEmployeeById(employeeId)
+                .map(savedEmployee->{
+                    savedEmployee.setFirstname(employee.getFirstname());
+                    savedEmployee.setLastname(employee.getLastname());
+                    savedEmployee.setEmail(employee.getEmail());
+                    Employee updatedEmployee = employeeService.updateEmployee(savedEmployee);
+                    return new ResponseEntity<>(updatedEmployee,HttpStatus.OK);
+                })
                 .orElseGet(()->ResponseEntity.notFound().build());
     }
 
